@@ -1,0 +1,269 @@
+/* ==========================================================================
+   AcxiomCRM — Base & Utility Stylesheet
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-dark);
+  color: var(--text-main);
+  min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(217, 91%, 60%, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(265, 89%, 66%, 0.1) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+a {
+  color: var(--primary-500);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-200);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--text-muted);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+  color: #ffffff;
+  box-shadow: 0 4px 14px hsla(221, 83%, 53%, 0.35);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  transform: translateY(-1px);
+  box-shadow: var(--glow-primary);
+}
+
+.btn-secondary {
+  background: hsla(222, 47%, 20%, 0.8);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-secondary:hover {
+  background: hsla(222, 47%, 25%, 0.9);
+  border-color: var(--primary-500);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-outline:hover {
+  background: hsla(217, 91%, 60%, 0.1);
+  border-color: var(--primary-500);
+  color: var(--primary-50);
+}
+
+.btn-danger {
+  background: var(--accent-rose);
+  color: #fff;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.825rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.form-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.45rem;
+  color: var(--text-main);
+}
+
+.form-label .req {
+  color: var(--accent-rose);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px hsla(217, 91%, 60%, 0.25);
+  background: hsla(222, 47%, 14%, 0.95);
+}
+
+.form-control.is-invalid {
+  border-color: var(--accent-rose);
+  box-shadow: 0 0 0 3px hsla(350, 89%, 60%, 0.2);
+}
+
+.form-control.is-valid {
+  border-color: var(--accent-emerald);
+}
+
+.validation-feedback {
+  font-size: 0.8rem;
+  margin-top: 0.35rem;
+  display: none;
+}
+
+.validation-feedback.error {
+  color: var(--accent-rose);
+  display: block;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-admin {
+  background: hsla(265, 89%, 66%, 0.18);
+  color: var(--accent-purple);
+  border: 1px solid hsla(265, 89%, 66%, 0.3);
+}
+
+.badge-manager {
+  background: hsla(190, 95%, 48%, 0.18);
+  color: var(--accent-cyan);
+  border: 1px solid hsla(190, 95%, 48%, 0.3);
+}
+
+.badge-sales {
+  background: hsla(152, 69%, 45%, 0.18);
+  color: var(--accent-emerald);
+  border: 1px solid hsla(152, 69%, 45%, 0.3);
+}
+
+/* Alerts */
+.alert {
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border: 1px solid transparent;
+}
+
+.alert-danger {
+  background: hsla(350, 89%, 60%, 0.12);
+  color: hsl(350, 89%, 80%);
+  border-color: hsla(350, 89%, 60%, 0.3);
+}
+
+.alert-warning {
+  background: hsla(38, 92%, 50%, 0.12);
+  color: hsl(38, 92%, 80%);
+  border-color: hsla(38, 92%, 50%, 0.3);
+}
+
+.alert-success {
+  background: hsla(152, 69%, 45%, 0.12);
+  color: hsl(152, 69%, 80%);
+  border-color: hsla(152, 69%, 45%, 0.3);
+}
+
+.alert-info {
+  background: hsla(217, 91%, 60%, 0.12);
+  color: hsl(217, 91%, 85%);
+  border-color: hsla(217, 91%, 60%, 0.3);
+}
+
+/* Toast Container */
+#toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toast {
+  min-width: 280px;
+  max-width: 400px;
+  padding: 0.9rem 1.25rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: slideIn 250ms ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}

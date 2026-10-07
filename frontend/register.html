@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register User — AcxiomCRM Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+  <div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 520px;">
+      <div class="auth-brand">
+        <div class="brand-logo">
+          <span>⚡</span> Acxiom<span style="color: var(--primary-500);">CRM</span>
+          <span class="brand-badge">Phase 1</span>
+        </div>
+        <p class="auth-subtitle">Provision a new CRM user with role-based permissions</p>
+      </div>
+
+      <div id="alert-container"></div>
+
+      <form id="register-form" novalidate>
+        <!-- Full Name -->
+        <div class="form-group">
+          <label class="form-label" for="fullName">
+            <span>Full Name <span class="req">*</span></span>
+          </label>
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            class="form-control"
+            placeholder="e.g. John Doe"
+            required
+          >
+          <div id="fullname-feedback" class="validation-feedback"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <!-- Username -->
+          <div class="form-group">
+            <label class="form-label" for="username">
+              <span>Username <span class="req">*</span></span>
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              class="form-control"
+              placeholder="johndoe"
+              required
+            >
+            <div id="username-feedback" class="validation-feedback"></div>
+          </div>
+
+          <!-- Role -->
+          <div class="form-group">
+            <label class="form-label" for="role">
+              <span>Primary Role <span class="req">*</span></span>
+            </label>
+            <select id="role" name="role" class="form-control">
+              <option value="SalesExecutive" selected>Sales Executive</option>
+              <option value="Manager">Manager</option>
+              <option value="Admin">Administrator</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Corporate Email -->
+        <div class="form-group">
+          <label class="form-label" for="email">
+            <span>Corporate Email <span class="req">*</span></span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-control"
+            placeholder="johndoe@acxiomcrm.local"
+            required
+          >
+          <div id="email-feedback" class="validation-feedback"></div>
+        </div>
+
+        <!-- Department -->
+        <div class="form-group">
+          <label class="form-label" for="department">
+            <span>Department</span>
+          </label>
+          <input
+            type="text"
+            id="department"
+            name="department"
+            class="form-control"
+            placeholder="Enterprise Sales / Key Accounts"
+          >
+        </div>
+
+        <!-- Password Field with Security Policy Meter -->
+        <div class="form-group">
+          <label class="form-label" for="password">
+            <span>Password (Identity Policy) <span class="req">*</span></span>
+          </label>
+          <div class="password-input-wrap">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              placeholder="Create strong password"
+              required
+            >
+            <button type="button" id="toggle-password" class="password-toggle-btn" aria-label="Toggle password visibility">
+              👁️
+            </button>
+          </div>
+          
+          <div class="password-meter-wrap">
+            <div class="meter-bar">
+              <div id="meter-fill" class="meter-fill"></div>
+            </div>
+            <ul class="policy-checklist">
+              <li id="rule-length" class="invalid"><span>•</span> Minimum 8 characters</li>
+              <li id="rule-upper" class="invalid"><span>•</span> At least 1 uppercase letter</li>
+              <li id="rule-lower" class="invalid"><span>•</span> At least 1 lowercase letter</li>
+              <li id="rule-digit" class="invalid"><span>•</span> At least 1 numeric digit (0-9)</li>
+              <li id="rule-special" class="invalid"><span>•</span> At least 1 special character (@#$%^&*)</li>
+            </ul>
+          </div>
+          <div id="password-feedback" class="validation-feedback"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-submit-register" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+          <span>Complete User Registration</span>
+        </button>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+          Already have an account? <a href="login.html" style="font-weight: 600;">Sign in here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      AppUI.setupPasswordToggle('toggle-password', 'password');
+
+      const registerForm = document.getElementById('register-form');
+      const fullNameInput = document.getElementById('fullName');
+      const usernameInput = document.getElementById('username');
+      const emailInput = document.getElementById('email');
+      const passInput = document.getElementById('password');
+      const roleSelect = document.getElementById('role');
+      const deptInput = document.getElementById('department');
+
+      const fnFeedback = document.getElementById('fullname-feedback');
+      const unFeedback = document.getElementById('username-feedback');
+      const emFeedback = document.getElementById('email-feedback');
+      const pwFeedback = document.getElementById('password-feedback');
+      const alertContainer = document.getElementById('alert-container');
+      const meterFill = document.getElementById('meter-fill');
+      const submitBtn = document.getElementById('btn-submit-register');
+
+      // Password rules checklist elements
+      const ruleLength = document.getElementById('rule-length');
+      const ruleUpper = document.getElementById('rule-upper');
+      const ruleLower = document.getElementById('rule-lower');
+      const ruleDigit = document.getElementById('rule-digit');
+      const ruleSpecial = document.getElementById('rule-special');
+
+      // Real-time password complexity evaluation
+      passInput.addEventListener('input', () => {
+        const val = passInput.value;
+        const res = ValidationEngine.checkPasswordStrength(val);
+
+        ruleLength.className = res.rules.length ? 'valid' : 'invalid';
+        ruleUpper.className = res.rules.upper ? 'valid' : 'invalid';
+        ruleLower.className = res.rules.lower ? 'valid' : 'invalid';
+        ruleDigit.className = res.rules.digit ? 'valid' : 'invalid';
+        ruleSpecial.className = res.rules.special ? 'valid' : 'invalid';
+
+        meterFill.className = `meter-fill ${res.level}`;
+      });
+
+      // Individual field blur validations
+      fullNameInput.addEventListener('blur', () => {
+        const res = ValidationEngine.validateRequired(fullNameInput.value, 'Full Name');
+        ValidationEngine.setFieldState(fullNameInput, fnFeedback, res);
+      });
+
+      usernameInput.addEventListener('blur', () => {
+        let res = ValidationEngine.validateRequired(usernameInput.value, 'Username');
+        if (res.valid) res = ValidationEngine.validateLength(usernameInput.value, 3, 50, 'Username');
+        ValidationEngine.setFieldState(usernameInput, unFeedback, res);
+      });
+
+      emailInput.addEventListener('blur', () => {
+        const res = ValidationEngine.validateEmail(emailInput.value);
+        ValidationEngine.setFieldState(emailInput, emFeedback, res);
+      });
+
+      // Form submission
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Validate all fields
+        const fnVal = ValidationEngine.validateRequired(fullNameInput.value, 'Full Name');
+        let unVal = ValidationEngine.validateRequired(usernameInput.value, 'Username');
+        if (unVal.valid) unVal = ValidationEngine.validateLength(usernameInput.value, 3, 50, 'Username');
+        const emVal = ValidationEngine.validateEmail(emailInput.value);
+        const pwStrength = ValidationEngine.checkPasswordStrength(passInput.value);
+
+        ValidationEngine.setFieldState(fullNameInput, fnFeedback, fnVal);
+        ValidationEngine.setFieldState(usernameInput, unFeedback, unVal);
+        ValidationEngine.setFieldState(emailInput, emFeedback, emVal);
+
+        if (!pwStrength.isValid) {
+          pwFeedback.textContent = 'Password does not meet enterprise complexity requirements.';
+          pwFeedback.classList.add('error');
+          passInput.classList.add('is-invalid');
+        } else {
+          pwFeedback.classList.remove('error');
+          passInput.classList.remove('is-invalid');
+        }
+
+        if (!fnVal.valid || !unVal.valid || !emVal.valid || !pwStrength.isValid) {
+          AppUI.showToast('Please fulfill all validation rules before submitting.', 'danger');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Creating user account...</span>';
+        alertContainer.innerHTML = '';
+
+        try {
+          const result = await AuthService.register(
+            fullNameInput.value.trim(),
+            usernameInput.value.trim(),
+            emailInput.value.trim(),
+            passInput.value,
+            roleSelect.value,
+            deptInput.value.trim()
+          );
+
+          if (result.success) {
+            AppUI.showToast(result.message, 'success');
+            setTimeout(() => {
+              window.location.href = 'dashboard.html';
+            }, 800);
+          } else {
+            alertContainer.innerHTML = `
+              <div class="alert alert-danger">
+                <span>⚠️</span>
+                <div>${result.message}</div>
+              </div>
+            `;
+          }
+        } catch (err) {
+          alertContainer.innerHTML = `
+            <div class="alert alert-danger">
+              <span>⚠️</span>
+              <div>An unexpected error occurred during registration.</div>
+            </div>
+          `;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Complete User Registration</span>';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

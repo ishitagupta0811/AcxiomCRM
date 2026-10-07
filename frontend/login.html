@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — AcxiomCRM Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-logo">
+          <span>⚡</span> Acxiom<span style="color: var(--primary-500);">CRM</span>
+          <span class="brand-badge">Phase 1</span>
+        </div>
+        <p class="auth-subtitle">Sign in to your enterprise sales workspace</p>
+      </div>
+
+      <!-- Lockout Alert Banner -->
+      <div id="lockout-banner" class="lockout-card">
+        <div style="font-weight: 700; color: var(--accent-rose); margin-bottom: 0.25rem;">
+          🔒 Account Temporarily Locked
+        </div>
+        <div id="lockout-timer" style="font-size: 0.8rem; color: #fff;">
+          Security policy enforced: 5 failed attempts reached. Try again in 15:00.
+        </div>
+      </div>
+
+      <!-- Form Error Alert Container -->
+      <div id="alert-container"></div>
+
+      <form id="login-form" novalidate>
+        <!-- Username / Email Field -->
+        <div class="form-group">
+          <label class="form-label" for="usernameOrEmail">
+            <span>Username or Corporate Email <span class="req">*</span></span>
+          </label>
+          <input
+            type="text"
+            id="usernameOrEmail"
+            name="usernameOrEmail"
+            class="form-control"
+            placeholder="admin@acxiomcrm.local or username"
+            required
+            autocomplete="username"
+          >
+          <div id="username-feedback" class="validation-feedback"></div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label class="form-label" for="password">
+            <span>Password <span class="req">*</span></span>
+          </label>
+          <div class="password-input-wrap">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              placeholder="••••••••••••"
+              required
+              autocomplete="current-password"
+            >
+            <button type="button" id="toggle-password" class="password-toggle-btn" aria-label="Toggle password visibility">
+              👁️
+            </button>
+          </div>
+          <div id="password-feedback" class="validation-feedback"></div>
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="auth-actions-row">
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="remember-me">
+            <span>Remember this device</span>
+          </label>
+          <a href="#" id="link-forgot" style="font-size: 0.8rem;">Forgot password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="btn-submit-login" class="btn btn-primary btn-block">
+          <span>Sign In to CRM</span>
+        </button>
+
+        <!-- Quick-Fill Demo Roles for Evaluation -->
+        <div class="demo-role-selector">
+          <div class="demo-role-selector-title">
+            <span>Quick Evaluation Login</span>
+            <span style="font-size: 0.65rem; color: var(--accent-cyan);">Click to Auto-fill</span>
+          </div>
+          <div class="demo-buttons-grid">
+            <button type="button" class="demo-btn" data-role="admin">Admin</button>
+            <button type="button" class="demo-btn" data-role="manager">Manager</button>
+            <button type="button" class="demo-btn" data-role="sales">Sales Exec</button>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+          Need an account? <a href="register.html" style="font-weight: 600;">Register new user</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      AppUI.setupPasswordToggle('toggle-password', 'password');
+
+      const loginForm = document.getElementById('login-form');
+      const userInput = document.getElementById('usernameOrEmail');
+      const passInput = document.getElementById('password');
+      const userFeedback = document.getElementById('username-feedback');
+      const passFeedback = document.getElementById('password-feedback');
+      const alertContainer = document.getElementById('alert-container');
+      const lockoutBanner = document.getElementById('lockout-banner');
+      const lockoutTimer = document.getElementById('lockout-timer');
+      const submitBtn = document.getElementById('btn-submit-login');
+
+      // Check lockout state on page load
+      function updateLockoutUI() {
+        const lockout = AuthService.getLockoutStatus();
+        if (lockout.isLocked) {
+          lockoutBanner.classList.add('active');
+          submitBtn.disabled = true;
+          const mins = Math.floor(lockout.remainingSeconds / 60);
+          const secs = lockout.remainingSeconds % 60;
+          lockoutTimer.textContent = `Security policy enforced: 5 failed attempts reached. Try again in ${mins}:${secs < 10 ? '0' : ''}${secs}.`;
+        } else {
+          lockoutBanner.classList.remove('active');
+          submitBtn.disabled = false;
+        }
+      }
+
+      updateLockoutUI();
+      setInterval(updateLockoutUI, 1000);
+
+      // Real-time client-side validation on blur
+      userInput.addEventListener('blur', () => {
+        const res = ValidationEngine.validateRequired(userInput.value, 'Username or Email');
+        ValidationEngine.setFieldState(userInput, userFeedback, res);
+      });
+
+      passInput.addEventListener('blur', () => {
+        const res = ValidationEngine.validateRequired(passInput.value, 'Password');
+        ValidationEngine.setFieldState(passInput, passFeedback, res);
+      });
+
+      // Quick Demo Auto-fill buttons
+      document.querySelectorAll('.demo-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const role = btn.dataset.role;
+          const demoUser = AppConfig.DEMO_USERS[role];
+          if (demoUser) {
+            userInput.value = demoUser.username;
+            passInput.value = demoUser.password;
+            userInput.classList.remove('is-invalid');
+            passInput.classList.remove('is-invalid');
+            userFeedback.classList.remove('error');
+            passFeedback.classList.remove('error');
+            AppUI.showToast(`Auto-filled ${demoUser.role} test credentials`, 'info');
+          }
+        });
+      });
+
+      // Submit Login handler
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // 1. Mandatory Client-side validation (Section 5.1 & 17.8)
+        const userVal = ValidationEngine.validateRequired(userInput.value, 'Username or Email');
+        const passVal = ValidationEngine.validateRequired(passInput.value, 'Password');
+
+        ValidationEngine.setFieldState(userInput, userFeedback, userVal);
+        ValidationEngine.setFieldState(passInput, passFeedback, passVal);
+
+        if (!userVal.valid || !passVal.valid) {
+          AppUI.showToast('Please correct form validation errors.', 'danger');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Verifying credentials...</span>';
+        alertContainer.innerHTML = '';
+
+        try {
+          const rememberMe = document.getElementById('remember-me').checked;
+          const result = await AuthService.login(userInput.value, passInput.value, rememberMe);
+
+          if (result.success) {
+            AppUI.showToast(result.message, 'success');
+            setTimeout(() => {
+              window.location.href = 'dashboard.html';
+            }, 600);
+          } else {
+            alertContainer.innerHTML = `
+              <div class="alert alert-danger">
+                <span>⚠️</span>
+                <div>${result.message}</div>
+              </div>
+            `;
+            updateLockoutUI();
+          }
+        } catch (err) {
+          alertContainer.innerHTML = `
+            <div class="alert alert-danger">
+              <span>⚠️</span>
+              <div>An unexpected error occurred during login. Please try again.</div>
+            </div>
+          `;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Sign In to CRM</span>';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

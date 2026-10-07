@@ -1,0 +1,10 @@
+{
+  "name": "acxiom-crm",
+  "version": "1.0.0",
+  "description": "AcxiomCRM Enterprise System",
+  "scripts": {
+    "start:backend": "node backend/server.js",
+    "start:frontend": "npm --prefix frontend run dev",
+    "build:frontend": "npm --prefix frontend run build"
+  }
+}

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leads — AcxiomCRM Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    .status-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .status-tab {
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.825rem;
+      font-weight: 600;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .status-tab.active {
+      background: var(--primary-600);
+      color: #fff;
+      border-color: var(--primary-500);
+    }
+    .badge-lead-new { background: hsla(217, 91%, 60%, 0.18); color: var(--primary-500); }
+    .badge-lead-contacted { background: hsla(190, 95%, 48%, 0.18); color: var(--accent-cyan); }
+    .badge-lead-qualified { background: hsla(152, 69%, 45%, 0.18); color: var(--accent-emerald); }
+    .badge-lead-converted { background: hsla(265, 89%, 66%, 0.18); color: var(--accent-purple); }
+    .badge-lead-lost { background: hsla(350, 89%, 60%, 0.18); color: var(--accent-rose); }
+  </style>
+</head>
+<body class="app-shell">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="dashboard.html" class="brand-logo">
+        <span>⚡</span> Acxiom<span style="color: var(--primary-500);">CRM</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="customers.html" class="nav-link">Customers</a></li>
+        <li><a href="leads.html" class="nav-link active">Leads</a></li>
+        <li><a href="#" class="nav-link" onclick="AppUI.showToast('Opportunities module activates in Phase 3', 'info')">Opportunities</a></li>
+        <li><a href="#" class="nav-link" onclick="AppUI.showToast('Follow-Ups module activates in Phase 3', 'info')">Follow-Ups</a></li>
+      </ul>
+    </div>
+
+    <div class="header-actions">
+      <div id="header-user-profile" style="display: flex; align-items: center; gap: 0.75rem;"></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+      <div>
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Lead Management &amp; Pipeline Capture</h1>
+        <p style="font-size: 0.9rem;">Track prospective accounts, qualification status, and convert into loyal customers</p>
+      </div>
+      <button id="btn-open-create-lead" class="btn btn-primary">
+        <span>+ Capture Lead</span>
+      </button>
+    </div>
+
+    <!-- Status Tabs Filter -->
+    <div class="status-tabs" id="lead-status-tabs">
+      <button class="status-tab active" data-status="All">All Leads</button>
+      <button class="status-tab" data-status="New">New</button>
+      <button class="status-tab" data-status="Contacted">Contacted</button>
+      <button class="status-tab" data-status="Qualified">Qualified</button>
+      <button class="status-tab" data-status="Converted">Converted</button>
+      <button class="status-tab" data-status="Lost">Lost</button>
+    </div>
+
+    <!-- Search Toolbar -->
+    <div style="margin-bottom: 1.5rem; max-width: 500px;">
+      <input
+        type="text"
+        id="search-lead"
+        class="form-control"
+        placeholder="Search by lead name, company, email, or lead code..."
+      >
+    </div>
+
+    <!-- Leads Data Table -->
+    <div class="data-table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Lead &amp; Company</th>
+            <th>Contact</th>
+            <th>Source</th>
+            <th>Expected Value</th>
+            <th>Status</th>
+            <th>Assigned Rep</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leads-table-body">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Create Lead Modal -->
+  <div id="modal-create-lead" class="modal-backdrop">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem;">Capture Prospective Lead</h3>
+        <button type="button" id="btn-close-lead-modal" class="btn btn-outline btn-sm">✕</button>
+      </div>
+
+      <div id="lead-modal-alert"></div>
+
+      <form id="create-lead-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="lead-name">
+            <span>Lead / Contact Name <span class="req">*</span></span>
+          </label>
+          <input type="text" id="lead-name" class="form-control" placeholder="Acme Inbound Lead" required>
+          <div id="lead-name-fb" class="validation-feedback"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="lead-email">
+              <span>Email <span class="req">*</span></span>
+            </label>
+            <input type="email" id="lead-email" class="form-control" placeholder="lead@company.com" required>
+            <div id="lead-email-fb" class="validation-feedback"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lead-phone">
+              <span>Phone (10 Digits) <span class="req">*</span></span>
+            </label>
+            <input type="tel" id="lead-phone" class="form-control" placeholder="9811223344" required>
+            <div id="lead-phone-fb" class="validation-feedback"></div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="lead-company">Company Name</label>
+            <input type="text" id="lead-company" class="form-control" placeholder="Nexa Dynamics">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lead-source">Lead Source</label>
+            <select id="lead-source" class="form-control">
+              <option value="Website Inquiry">Website Inquiry</option>
+              <option value="Partner Referral">Partner Referral</option>
+              <option value="Direct Outreach">Direct Outreach</option>
+              <option value="Event / Expo">Event / Expo</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="lead-value">Expected Deal Value (₹ / $)</label>
+          <input type="number" id="lead-value" class="form-control" placeholder="25000" min="0" step="100">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" id="btn-cancel-lead-modal" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Capture Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lead Conversion Modal (Section 8 & 17.6) -->
+  <div id="modal-convert-lead" class="modal-backdrop">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem;">Convert Lead to Customer Master</h3>
+        <button type="button" id="btn-close-convert-modal" class="btn btn-outline btn-sm">✕</button>
+      </div>
+
+      <div class="alert alert-info">
+        <span>ℹ️</span>
+        <div>This action automatically provisions a new Customer record from this lead and initiates an Opportunity in the sales pipeline.</div>
+      </div>
+
+      <form id="convert-lead-form">
+        <input type="hidden" id="convert-lead-id">
+        <div class="form-group">
+          <label class="form-label">Lead Details</label>
+          <div id="convert-lead-summary" style="padding: 0.75rem; background: hsla(222, 47%, 12%, 0.8); border-radius: 8px; font-size: 0.85rem;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="convert-opp-name">Initial Opportunity Name</label>
+          <input type="text" id="convert-opp-name" class="form-control" placeholder="Commercial Deal Phase 1">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="convert-opp-amount">Opportunity Deal Amount <span class="req">*</span></label>
+          <input type="number" id="convert-opp-amount" class="form-control" min="1" step="100" value="10000" required>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" id="btn-cancel-convert-modal" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--accent-emerald), var(--primary-600));">
+            <span>Confirm &amp; Convert</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/customers.js"></script>
+  <script src="js/leads.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let activeStatus = 'All';
+      const searchInput = document.getElementById('search-lead');
+      const tableBody = document.getElementById('leads-table-body');
+      const statusTabs = document.querySelectorAll('.status-tab');
+
+      // Modals
+      const createModal = document.getElementById('modal-create-lead');
+      const convertModal = document.getElementById('modal-convert-lead');
+      const openCreateBtn = document.getElementById('btn-open-create-lead');
+      const closeCreateBtn = document.getElementById('btn-close-lead-modal');
+      const cancelCreateBtn = document.getElementById('btn-cancel-lead-modal');
+      const closeConvertBtn = document.getElementById('btn-close-convert-modal');
+      const cancelConvertBtn = document.getElementById('btn-cancel-convert-modal');
+
+      const createForm = document.getElementById('create-lead-form');
+      const convertForm = document.getElementById('convert-lead-form');
+      const modalAlert = document.getElementById('lead-modal-alert');
+
+      async function loadLeads() {
+        const filter = {
+          searchTerm: searchInput.value.trim(),
+          status: activeStatus,
+          pageNumber: 1,
+          pageSize: 20
+        };
+
+        const result = await LeadService.getLeads(filter);
+        renderTable(result.items);
+      }
+
+      function getBadgeClass(status) {
+        switch(status.toLowerCase()) {
+          case 'new': return 'badge-lead-new';
+          case 'contacted': return 'badge-lead-contacted';
+          case 'qualified': return 'badge-lead-qualified';
+          case 'converted': return 'badge-lead-converted';
+          case 'lost': return 'badge-lead-lost';
+          default: return 'badge-sales';
+        }
+      }
+
+      function renderTable(items) {
+        if (!items || items.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="8" class="table-empty">
+                <div>🔍 No leads found matching current criteria.</div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = items.map(l => `
+          <tr>
+            <td><code style="font-family: var(--font-mono); color: var(--accent-cyan); font-weight: 600;">${l.leadCode}</code></td>
+            <td>
+              <div style="font-weight: 600;">${l.leadName}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${l.companyName || 'Individual'}</div>
+            </td>
+            <td>
+              <div style="font-size: 0.85rem;">${l.email}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${l.phone}</div>
+            </td>
+            <td>${l.source}</td>
+            <td><strong>$${(l.expectedValue || 0).toLocaleString()}</strong></td>
+            <td><span class="badge ${getBadgeClass(l.status)}">${l.status}</span></td>
+            <td><span style="font-size: 0.8rem;">${l.assignedUserName || 'Unassigned'}</span></td>
+            <td style="text-align: right;">
+              ${l.status !== 'Converted' ? `
+                <div style="display: inline-flex; gap: 0.35rem;">
+                  <button class="btn btn-sm btn-outline" onclick="advanceStatus(${l.leadId}, '${l.status}')">
+                    ${l.status === 'New' ? 'Contact' : (l.status === 'Contacted' ? 'Qualify' : 'Status')}
+                  </button>
+                  <button class="btn btn-sm btn-primary" onclick="openConvertModal(${l.leadId}, '${l.leadName}', '${l.companyName || ''}', ${l.expectedValue || 10000})">
+                    Convert ➔
+                  </button>
+                </div>
+              ` : `
+                <span style="color: var(--accent-purple); font-size: 0.8rem; font-weight: 600;">Converted ✓</span>
+              `}
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Status tab switches
+      statusTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          statusTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          activeStatus = tab.dataset.status;
+          loadLeads();
+        });
+      });
+
+      // Search
+      let debounce;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(debounce);
+        debounce = setTimeout(loadLeads, 250);
+      });
+
+      // Create modal
+      openCreateBtn.addEventListener('click', () => {
+        createModal.classList.add('show');
+        createForm.reset();
+        modalAlert.innerHTML = '';
+      });
+
+      function closeCreate() { createModal.classList.remove('show'); }
+      closeCreateBtn.addEventListener('click', closeCreate);
+      cancelCreateBtn.addEventListener('click', closeCreate);
+
+      // Create Lead submission
+      createForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nameInput = document.getElementById('lead-name');
+        const emailInput = document.getElementById('lead-email');
+        const phoneInput = document.getElementById('lead-phone');
+
+        const nameVal = ValidationEngine.validateRequired(nameInput.value, 'Lead Name');
+        const emailVal = ValidationEngine.validateEmail(emailInput.value);
+        const phoneVal = ValidationEngine.validatePhone(phoneInput.value);
+
+        ValidationEngine.setFieldState(nameInput, document.getElementById('lead-name-fb'), nameVal);
+        ValidationEngine.setFieldState(emailInput, document.getElementById('lead-email-fb'), emailVal);
+        ValidationEngine.setFieldState(phoneInput, document.getElementById('lead-phone-fb'), phoneVal);
+
+        if (!nameVal.valid || !emailVal.valid || !phoneVal.valid) {
+          AppUI.showToast('Please fulfill all validation rules.', 'danger');
+          return;
+        }
+
+        const payload = {
+          leadName: nameInput.value.trim(),
+          email: emailInput.value.trim(),
+          phone: phoneInput.value.trim(),
+          companyName: document.getElementById('lead-company').value.trim(),
+          source: document.getElementById('lead-source').value,
+          expectedValue: parseFloat(document.getElementById('lead-value').value) || 0
+        };
+
+        const res = await LeadService.createLead(payload);
+        if (res.success) {
+          AppUI.showToast(res.message, 'success');
+          closeCreate();
+          loadLeads();
+        } else {
+          modalAlert.innerHTML = `<div class="alert alert-danger">${res.message}</div>`;
+        }
+      });
+
+      // Status advancement helper
+      window.advanceStatus = async function(id, current) {
+        let next = 'Contacted';
+        if (current === 'Contacted') next = 'Qualified';
+        else if (current === 'Qualified') next = 'Converted';
+
+        const res = await LeadService.updateLeadStatus(id, next);
+        if (res.success) {
+          AppUI.showToast(res.message, 'success');
+          loadLeads();
+        }
+      };
+
+      // Conversion modal
+      window.openConvertModal = function(id, name, company, amount) {
+        document.getElementById('convert-lead-id').value = id;
+        document.getElementById('convert-lead-summary').textContent = `${name} (${company || 'Individual'})`;
+        document.getElementById('convert-opp-name').value = `${name} - Opportunity Deal`;
+        document.getElementById('convert-opp-amount').value = amount || 10000;
+        convertModal.classList.add('show');
+      };
+
+      function closeConvert() { convertModal.classList.remove('show'); }
+      closeConvertBtn.addEventListener('click', closeConvert);
+      cancelConvertBtn.addEventListener('click', closeConvert);
+
+      convertForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const leadId = parseInt(document.getElementById('convert-lead-id').value, 10);
+        const oppName = document.getElementById('convert-opp-name').value.trim();
+        const oppAmount = parseFloat(document.getElementById('convert-opp-amount').value) || 1000;
+
+        if (oppAmount <= 0) {
+          AppUI.showToast('Opportunity amount must be greater than 0.', 'danger');
+          return;
+        }
+
+        const res = await LeadService.convertLead(leadId, {
+          opportunityName: oppName,
+          opportunityAmount: oppAmount
+        });
+
+        if (res.success) {
+          AppUI.showToast(res.message, 'success');
+          closeConvert();
+          loadLeads();
+        } else {
+          AppUI.showToast(res.message, 'danger');
+        }
+      });
+
+      loadLeads();
+    });
+  </script>
+</body>
+</html>

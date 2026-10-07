@@ -1,0 +1,227 @@
+/* ==========================================================================
+   AcxiomCRM — Authentication Views Styling
+   ========================================================================== */
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  padding: 2.5rem 2.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-600), var(--accent-cyan), var(--accent-purple));
+}
+
+.auth-brand {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.brand-badge {
+  background: linear-gradient(135deg, var(--primary-600), var(--accent-purple));
+  color: #fff;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.auth-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Password Toggle & Strength Meter */
+.password-input-wrap {
+  position: relative;
+}
+
+.password-input-wrap input {
+  padding-right: 2.75rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle-btn:hover {
+  color: var(--text-main);
+}
+
+.password-meter-wrap {
+  margin-top: 0.5rem;
+}
+
+.meter-bar {
+  height: 4px;
+  background: hsla(217, 33%, 30%, 0.4);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 250ms ease, background-color 250ms ease;
+}
+
+.meter-fill.weak { width: 25%; background-color: var(--accent-rose); }
+.meter-fill.fair { width: 50%; background-color: var(--accent-amber); }
+.meter-fill.good { width: 75%; background-color: var(--primary-500); }
+.meter-fill.strong { width: 100%; background-color: var(--accent-emerald); }
+
+.policy-checklist {
+  list-style: none;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.35rem;
+}
+
+.policy-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.policy-checklist li.valid {
+  color: var(--accent-emerald);
+}
+
+.policy-checklist li.invalid {
+  color: var(--text-disabled);
+}
+
+/* Quick Fill Demo Role Buttons */
+.demo-role-selector {
+  margin: 1.5rem 0 1rem 0;
+  padding: 1rem;
+  background: hsla(222, 47%, 10%, 0.5);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-subtle);
+}
+
+.demo-role-selector-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.demo-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.demo-btn {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  background: hsla(222, 47%, 18%, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.demo-btn:hover {
+  background: var(--primary-600);
+  border-color: var(--primary-500);
+  color: #fff;
+}
+
+/* Remember me & links */
+.auth-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.checkbox-wrap input {
+  accent-color: var(--primary-600);
+}
+
+/* Lockout Banner */
+.lockout-card {
+  border: 1px solid var(--accent-rose);
+  background: hsla(350, 89%, 60%, 0.12);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  display: none;
+}
+
+.lockout-card.active {
+  display: block;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 hsla(350, 89%, 60%, 0.4); }
+  70% { box-shadow: 0 0 0 8px hsla(350, 89%, 60%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(350, 89%, 60%, 0); }
+}

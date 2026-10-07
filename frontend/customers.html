@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customers — AcxiomCRM Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    .toolbar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .filters-wrap {
+      display: flex;
+      gap: 0.75rem;
+      flex: 1;
+      max-width: 600px;
+    }
+    .data-table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--glass-shadow);
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+    .data-table th {
+      background: hsla(222, 47%, 12%, 0.8);
+      padding: 0.9rem 1.25rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid hsla(217, 33%, 30%, 0.2);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+    .data-table tr:hover {
+      background: hsla(222, 47%, 20%, 0.4);
+    }
+    .table-empty {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+    }
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body class="app-shell">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <a href="dashboard.html" class="brand-logo">
+        <span>⚡</span> Acxiom<span style="color: var(--primary-500);">CRM</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="customers.html" class="nav-link active">Customers</a></li>
+        <li><a href="leads.html" class="nav-link">Leads</a></li>
+        <li><a href="#" class="nav-link" onclick="AppUI.showToast('Opportunities module activates in Phase 3', 'info')">Opportunities</a></li>
+        <li><a href="#" class="nav-link" onclick="AppUI.showToast('Follow-Ups module activates in Phase 3', 'info')">Follow-Ups</a></li>
+        <li class="nav-admin-only"><a href="#" class="nav-link" onclick="AppUI.showToast('Audit Log is available in Admin dashboard', 'info')">Audit Logs</a></li>
+      </ul>
+    </div>
+
+    <div class="header-actions">
+      <div id="header-user-profile" style="display: flex; align-items: center; gap: 0.75rem;"></div>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Page Header & Action -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+      <div>
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Customer Master Data</h1>
+        <p style="font-size: 0.9rem;">Manage enterprise accounts, contacts, and relationship records</p>
+      </div>
+      <button id="btn-open-create-customer" class="btn btn-primary">
+        <span>+ New Customer</span>
+      </button>
+    </div>
+
+    <!-- Search & Filter Toolbar -->
+    <div class="toolbar-row">
+      <div class="filters-wrap">
+        <input
+          type="text"
+          id="search-customer"
+          class="form-control"
+          placeholder="Search by customer name, company, email, or phone..."
+        >
+        <select id="filter-status" class="form-control" style="max-width: 160px;">
+          <option value="All">All Statuses</option>
+          <option value="Active" selected>Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-muted);" id="customer-count-label">
+        Loading records...
+      </div>
+    </div>
+
+    <!-- Customer Data Table -->
+    <div class="data-table-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Customer &amp; Company</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Assigned Rep</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="customers-table-body">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+
+      <div class="pagination-bar">
+        <span id="pagination-info">Showing 1-10 of 10</span>
+        <div style="display: flex; gap: 0.5rem;">
+          <button id="btn-prev-page" class="btn btn-outline btn-sm" disabled>Previous</button>
+          <button id="btn-next-page" class="btn btn-outline btn-sm" disabled>Next</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Customer Modal -->
+  <div id="modal-create-customer" class="modal-backdrop">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem;">Create New Customer</h3>
+        <button type="button" id="btn-close-modal" class="btn btn-outline btn-sm">✕</button>
+      </div>
+
+      <div id="modal-alert-container"></div>
+
+      <form id="create-customer-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="cust-name">
+            <span>Customer Name <span class="req">*</span></span>
+          </label>
+          <input type="text" id="cust-name" class="form-control" placeholder="Acme Technologies Corp" required>
+          <div id="name-feedback" class="validation-feedback"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="cust-email">
+              <span>Corporate Email <span class="req">*</span></span>
+            </label>
+            <input type="email" id="cust-email" class="form-control" placeholder="contact@acme.com" required>
+            <div id="email-feedback" class="validation-feedback"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="cust-phone">
+              <span>Phone (10 Digits) <span class="req">*</span></span>
+            </label>
+            <input type="tel" id="cust-phone" class="form-control" placeholder="9876543210" required>
+            <div id="phone-feedback" class="validation-feedback"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cust-company">
+            <span>Company Name</span>
+          </label>
+          <input type="text" id="cust-company" class="form-control" placeholder="Acme Inc">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="cust-address">
+            <span>Address</span>
+          </label>
+          <input type="text" id="cust-address" class="form-control" placeholder="123 Tech Blvd, Suite 400">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="cust-city">City</label>
+            <input type="text" id="cust-city" class="form-control" placeholder="Bangalore">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cust-state">State</label>
+            <input type="text" id="cust-state" class="form-control" placeholder="Karnataka">
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" id="btn-cancel-modal" class="btn btn-secondary">Cancel</button>
+          <button type="submit" id="btn-save-customer" class="btn btn-primary">Save Customer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/validation.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/customers.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentPage = 1;
+      const searchInput = document.getElementById('search-customer');
+      const statusSelect = document.getElementById('filter-status');
+      const tableBody = document.getElementById('customers-table-body');
+      const countLabel = document.getElementById('customer-count-label');
+      const paginationInfo = document.getElementById('pagination-info');
+      const prevBtn = document.getElementById('btn-prev-page');
+      const nextBtn = document.getElementById('btn-next-page');
+
+      // Modal elements
+      const modal = document.getElementById('modal-create-customer');
+      const openModalBtn = document.getElementById('btn-open-create-customer');
+      const closeModalBtn = document.getElementById('btn-close-modal');
+      const cancelModalBtn = document.getElementById('btn-cancel-modal');
+      const createForm = document.getElementById('create-customer-form');
+      const modalAlert = document.getElementById('modal-alert-container');
+
+      const nameInput = document.getElementById('cust-name');
+      const emailInput = document.getElementById('cust-email');
+      const phoneInput = document.getElementById('cust-phone');
+      const nameFb = document.getElementById('name-feedback');
+      const emailFb = document.getElementById('email-feedback');
+      const phoneFb = document.getElementById('phone-feedback');
+
+      async function loadCustomers() {
+        const filter = {
+          searchTerm: searchInput.value.trim(),
+          status: statusSelect.value,
+          pageNumber: currentPage,
+          pageSize: 8
+        };
+
+        const result = await CustomerService.getCustomers(filter);
+        renderTable(result.items);
+
+        countLabel.textContent = `${result.totalCount} customer(s) found`;
+        paginationInfo.textContent = `Page ${result.pageNumber} of ${result.totalPages || 1} (${result.totalCount} total)`;
+
+        prevBtn.disabled = result.pageNumber <= 1;
+        nextBtn.disabled = result.pageNumber >= (result.totalPages || 1);
+      }
+
+      function renderTable(items) {
+        if (!items || items.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="8" class="table-empty">
+                <div>🔍 No customers found matching your criteria.</div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tableBody.innerHTML = items.map(c => `
+          <tr>
+            <td><code style="font-family: var(--font-mono); color: var(--accent-cyan); font-weight: 600;">${c.customerCode}</code></td>
+            <td>
+              <div style="font-weight: 600;">${c.customerName}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">${c.companyName || 'No Company'}</div>
+            </td>
+            <td>${c.email}</td>
+            <td>${c.phone}</td>
+            <td>${c.city ? `${c.city}, ${c.state || ''}` : '—'}</td>
+            <td><span class="badge ${c.status === 'Active' ? 'badge-sales' : 'badge-admin'}">${c.status}</span></td>
+            <td><span style="font-size: 0.8rem;">${c.ownerName || 'Unassigned'}</span></td>
+            <td style="text-align: right;">
+              <button class="btn btn-outline btn-sm" onclick="deactivateCustomer(${c.customerId}, '${c.customerName}')">Deactivate</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Search & Filter listeners
+      let debounceTimer;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          currentPage = 1;
+          loadCustomers();
+        }, 250);
+      });
+
+      statusSelect.addEventListener('change', () => {
+        currentPage = 1;
+        loadCustomers();
+      });
+
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          loadCustomers();
+        }
+      });
+
+      nextBtn.addEventListener('click', () => {
+        currentPage++;
+        loadCustomers();
+      });
+
+      // Modal Open / Close
+      openModalBtn.addEventListener('click', () => {
+        modal.classList.add('show');
+        createForm.reset();
+        modalAlert.innerHTML = '';
+        [nameInput, emailInput, phoneInput].forEach(el => el.classList.remove('is-invalid', 'is-valid'));
+      });
+
+      function closeModal() {
+        modal.classList.remove('show');
+      }
+
+      closeModalBtn.addEventListener('click', closeModal);
+      cancelModalBtn.addEventListener('click', closeModal);
+
+      // Live Duplicate & Format Verification on Blur (Section 5.1 & 17.5)
+      emailInput.addEventListener('blur', async () => {
+        const val = ValidationEngine.validateEmail(emailInput.value);
+        if (!val.valid) {
+          ValidationEngine.setFieldState(emailInput, emailFb, val);
+          return;
+        }
+
+        const dup = await CustomerService.checkDuplicate(emailInput.value, null);
+        if (!dup.isEmailUnique) {
+          ValidationEngine.setFieldState(emailInput, emailFb, { valid: false, message: 'A customer with this email already exists.' });
+        } else {
+          ValidationEngine.setFieldState(emailInput, emailFb, { valid: true });
+        }
+      });
+
+      phoneInput.addEventListener('blur', async () => {
+        const val = ValidationEngine.validatePhone(phoneInput.value);
+        if (!val.valid) {
+          ValidationEngine.setFieldState(phoneInput, phoneFb, val);
+          return;
+        }
+
+        const dup = await CustomerService.checkDuplicate(null, phoneInput.value);
+        if (!dup.isPhoneUnique) {
+          ValidationEngine.setFieldState(phoneInput, phoneFb, { valid: false, message: 'A customer with this phone number already exists.' });
+        } else {
+          ValidationEngine.setFieldState(phoneInput, phoneFb, { valid: true });
+        }
+      });
+
+      // Submit Create Customer
+      createForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const nameVal = ValidationEngine.validateRequired(nameInput.value, 'Customer Name');
+        const emailVal = ValidationEngine.validateEmail(emailInput.value);
+        const phoneVal = ValidationEngine.validatePhone(phoneInput.value);
+
+        ValidationEngine.setFieldState(nameInput, nameFb, nameVal);
+        ValidationEngine.setFieldState(emailInput, emailFb, emailVal);
+        ValidationEngine.setFieldState(phoneInput, phoneFb, phoneVal);
+
+        if (!nameVal.valid || !emailVal.valid || !phoneVal.valid) {
+          AppUI.showToast('Please fulfill all validation rules.', 'danger');
+          return;
+        }
+
+        const payload = {
+          customerName: nameInput.value.trim(),
+          email: emailInput.value.trim(),
+          phone: phoneInput.value.trim(),
+          companyName: document.getElementById('cust-company').value.trim(),
+          address: document.getElementById('cust-address').value.trim(),
+          city: document.getElementById('cust-city').value.trim(),
+          state: document.getElementById('cust-state').value.trim()
+        };
+
+        const result = await CustomerService.createCustomer(payload);
+        if (result.success) {
+          AppUI.showToast(result.message, 'success');
+          closeModal();
+          loadCustomers();
+        } else {
+          modalAlert.innerHTML = `
+            <div class="alert alert-danger">
+              <span>⚠️</span>
+              <div>${result.message}</div>
+            </div>
+          `;
+        }
+      });
+
+      window.deactivateCustomer = async function(id, name) {
+        if (confirm(`Are you sure you want to deactivate customer "${name}"?`)) {
+          const res = await CustomerService.deleteCustomer(id);
+          if (res.success) {
+            AppUI.showToast(res.message, 'success');
+            loadCustomers();
+          } else {
+            AppUI.showToast(res.message, 'danger');
+          }
+        }
+      };
+
+      loadCustomers();
+    });
+  </script>
+</body>
+</html>
