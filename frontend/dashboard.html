@@ -1,31 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — AcxiomCRM Enterprise</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="css/variables.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
 </head>
+
 <body class="app-shell">
 
   <!-- Top Navigation Header -->
   <header class="app-header">
     <div class="header-brand">
       <a href="dashboard.html" class="brand-logo">
-        <span>⚡</span> Acxiom<span style="color: var(--primary-500);">CRM</span>
+        Acxiom<span style="color: var(--primary-500);">CRM</span>
       </a>
       <ul class="nav-links">
         <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
         <li><a href="customers.html" class="nav-link">Customers</a></li>
         <li><a href="leads.html" class="nav-link">Leads</a></li>
-        <li><a href="#" class="nav-link" onclick="AppUI.showToast('Opportunities module activates in Phase 3', 'info')">Opportunities</a></li>
-        <li><a href="#" class="nav-link" onclick="AppUI.showToast('Follow-Ups module activates in Phase 3', 'info')">Follow-Ups</a></li>
-        <li class="nav-manager-only"><a href="#" class="nav-link" onclick="AppUI.showToast('Pipeline Analytics module activates in Phase 6', 'info')">Team Pipeline</a></li>
+        <li><a href="#" class="nav-link"
+            onclick="AppUI.showToast('Opportunities module activates in Phase 3', 'info')">Opportunities</a></li>
+        <li><a href="#" class="nav-link"
+            onclick="AppUI.showToast('Follow-Ups module activates in Phase 3', 'info')">Follow-Ups</a></li>
+        <li class="nav-manager-only"><a href="#" class="nav-link"
+            onclick="AppUI.showToast('Pipeline Analytics module activates in Phase 6', 'info')">Team Pipeline</a></li>
         <li class="nav-admin-only"><a href="#" id="btn-view-audit" class="nav-link">Audit Logs</a></li>
       </ul>
     </div>
@@ -100,7 +107,8 @@
     <div class="phase-panel">
       <div class="phase-panel-header">
         <div>
-          <h3 style="font-size: 1.15rem; margin-bottom: 0.25rem;">Phase 1: Foundation & Identity Architecture Verification</h3>
+          <h3 style="font-size: 1.15rem; margin-bottom: 0.25rem;">Phase 1: Foundation & Identity Architecture
+            Verification</h3>
           <p style="font-size: 0.85rem; color: var(--text-muted);">
             Compliance checklist against Problem Statement Section 6, 7 &amp; 17.4
           </p>
@@ -254,4 +262,5 @@
     });
   </script>
 </body>
+
 </html>
